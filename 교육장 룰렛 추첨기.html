@@ -1,0 +1,910 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>교육장 룰렛 추첨기</title>
+<style>
+  /* ===== 기본 색상·글꼴 변수 ===== */
+  :root{
+    --bg:#FFF8EC;
+    --ink:#2B2D42;
+    --muted:#7A7F95;
+    --line:#F1E5D1;
+    --primary:#FF5A5F;
+    --primary-d:#D9434A;
+    --blue:#3D7BFF;
+    --blue-d:#2A5FD6;
+    --green:#1FB57A;
+    --green-d:#16925F;
+    --yellow:#FFC93C;
+    --radius:20px;
+    --shadow:0 8px 24px rgba(80,50,10,.08);
+    --fs:18px; /* 글씨 크기 조절용 기준값 */
+  }
+  html{font-size:var(--fs);}
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    min-height:100vh;
+    color:var(--ink);
+    font-family:"Pretendard","Malgun Gothic","맑은 고딕","Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+    background:
+      radial-gradient(circle at 8% 10%, #FFE3E3 0, transparent 30%),
+      radial-gradient(circle at 92% 15%, #DDEBFF 0, transparent 30%),
+      radial-gradient(circle at 80% 95%, #FFF1C2 0, transparent 35%),
+      var(--bg);
+  }
+  button{font-family:inherit;}
+
+  /* ===== 상단 바 ===== */
+  .app{max-width:1600px;margin:0 auto;padding:16px 22px 30px;}
+  header{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px;}
+  h1{margin:0;font-size:1.9rem;font-weight:900;letter-spacing:-.02em;}
+  h1 .dot{color:var(--primary);}
+  .hdr-actions{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;}
+
+  /* ===== 공통 버튼 ===== */
+  .btn{
+    border:0;border-radius:14px;cursor:pointer;font-weight:800;
+    font-size:1rem;padding:.6em 1em;background:#fff;color:var(--ink);
+    box-shadow:0 3px 0 #E6D9C4, var(--shadow);
+    transition:transform .08s, box-shadow .08s, filter .15s;
+  }
+  .btn:hover{filter:brightness(1.04);}
+  .btn:active{transform:translateY(3px);box-shadow:0 0 0 #E6D9C4;}
+  .btn:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+  .btn-primary{background:var(--primary);color:#fff;box-shadow:0 5px 0 var(--primary-d), var(--shadow);}
+  .btn-primary:active{box-shadow:0 0 0 var(--primary-d);transform:translateY(5px);}
+  .btn-blue{background:var(--blue);color:#fff;box-shadow:0 4px 0 var(--blue-d), var(--shadow);}
+  .btn-blue:active{box-shadow:0 0 0 var(--blue-d);transform:translateY(4px);}
+  .btn-green{background:var(--green);color:#fff;box-shadow:0 4px 0 var(--green-d), var(--shadow);}
+  .btn-green:active{box-shadow:0 0 0 var(--green-d);transform:translateY(4px);}
+  .btn-big{font-size:1.6rem;padding:.75em 1.2em;width:100%;border-radius:18px;}
+
+  /* ===== 전체 배치 ===== */
+  .layout{display:grid;grid-template-columns:330px minmax(0,1fr);gap:20px;align-items:start;}
+  .layout.collapsed{grid-template-columns:minmax(0,1fr);}
+  .layout.collapsed aside{display:none;}
+  @media (max-width:960px){.layout{grid-template-columns:minmax(0,1fr);}}
+
+  .card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;}
+
+  /* ===== 명단 입력 ===== */
+  aside h2{margin:0 0 6px;font-size:1.25rem;}
+  .hint{margin:0 0 10px;color:var(--muted);font-size:.85rem;line-height:1.5;}
+  textarea{
+    width:100%;height:52vh;min-height:220px;resize:vertical;
+    border:2px solid var(--line);border-radius:14px;padding:12px 14px;
+    font-family:inherit;font-size:1.05rem;line-height:1.65;color:var(--ink);
+    outline:none;background:#FFFDF8;
+  }
+  textarea:focus{border-color:var(--yellow);}
+  .count-row{display:flex;align-items:center;justify-content:space-between;margin-top:10px;gap:8px;flex-wrap:wrap;}
+  .count{font-weight:900;font-size:1.15rem;}
+  .count b{color:var(--primary);font-size:1.4rem;}
+  .dup{color:var(--muted);font-size:.8rem;}
+  .small-btns{display:flex;gap:6px;}
+  .small-btns .btn{font-size:.85rem;padding:.45em .8em;}
+
+  /* ===== 탭 ===== */
+  .tabs{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+  .tab{
+    border:2px solid var(--line);background:#fff;color:var(--ink);cursor:pointer;
+    font-size:1.2rem;font-weight:900;padding:.6em 1.3em;border-radius:999px;
+  }
+  .tab.active{background:var(--ink);border-color:var(--ink);color:#fff;}
+  .panel{display:none;}
+  .panel.active{display:block;}
+
+  /* ===== 룰렛 ===== */
+  .roulette{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:24px;align-items:center;}
+  @media (max-width:1150px){.roulette{grid-template-columns:minmax(0,1fr);}}
+  .wheel-box{width:100%;max-width:min(74vh,700px);aspect-ratio:1/1;margin:0 auto;}
+  #wheel{display:block;cursor:pointer;}
+  .live{text-align:center;font-size:2rem;font-weight:900;min-height:1.5em;margin-top:8px;color:var(--ink);}
+  .controls{display:flex;flex-direction:column;gap:14px;}
+  .check{display:flex;align-items:center;gap:10px;font-size:1.1rem;font-weight:700;cursor:pointer;user-select:none;}
+  .check input{width:1.3em;height:1.3em;accent-color:var(--primary);}
+  .remain{font-size:1.1rem;font-weight:700;color:var(--muted);}
+  .remain b{color:var(--ink);font-size:1.4rem;}
+  .history h3{margin:0 0 8px;font-size:1.05rem;display:flex;justify-content:space-between;align-items:center;}
+  .history h3 .btn{font-size:.8rem;padding:.35em .7em;}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;max-height:30vh;overflow:auto;}
+  .chip{background:#FFF1C2;border-radius:999px;padding:.3em .8em;font-weight:800;font-size:.95rem;}
+  .chip i{font-style:normal;color:var(--muted);margin-right:4px;font-size:.8rem;}
+  .empty{color:var(--muted);font-size:.95rem;}
+
+  /* ===== 조 편성 ===== */
+  .team-bar{display:flex;flex-wrap:wrap;align-items:center;gap:12px 18px;margin-bottom:16px;}
+  .seg{display:inline-flex;background:#F6EFE3;border-radius:14px;padding:4px;}
+  .seg label{cursor:pointer;}
+  .seg input{display:none;}
+  .seg span{display:block;padding:.5em 1em;border-radius:10px;font-weight:800;font-size:1.05rem;color:var(--muted);}
+  .seg input:checked + span{background:#fff;color:var(--ink);box-shadow:0 2px 6px rgba(0,0,0,.08);}
+  .stepper{display:inline-flex;align-items:center;gap:6px;font-weight:800;font-size:1.15rem;}
+  .stepper button{width:2.2em;height:2.2em;border-radius:12px;border:0;background:#F6EFE3;font-size:1.2rem;font-weight:900;cursor:pointer;color:var(--ink);}
+  .stepper input{width:3.4em;text-align:center;font-size:1.4rem;font-weight:900;border:2px solid var(--line);border-radius:12px;padding:.2em;font-family:inherit;color:var(--ink);}
+  .team-actions{display:flex;gap:8px;flex-wrap:wrap;margin-left:auto;}
+  .team-actions .btn{font-size:1.1rem;}
+  .summary{font-size:1.15rem;font-weight:800;margin:0 0 14px;color:var(--muted);}
+  .summary b{color:var(--ink);}
+  .teams{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px;}
+  .team{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;animation:rise .45s both;}
+  .team-head{padding:.6em 1em;font-size:1.4rem;font-weight:900;display:flex;justify-content:space-between;align-items:baseline;}
+  .team-head small{font-size:.95rem;font-weight:800;opacity:.85;}
+  .team ul{list-style:none;margin:0;padding:.6em 1em 1em;}
+  .team li{font-size:1.35rem;font-weight:800;padding:.28em 0;border-bottom:1px dashed var(--line);}
+  .team li:last-child{border-bottom:0;}
+  .team-empty{padding:40px;text-align:center;color:var(--muted);font-size:1.2rem;}
+  @keyframes rise{from{opacity:0;transform:translateY(14px) scale(.97);}to{opacity:1;transform:none;}}
+
+  /* ===== 당첨자 발표 화면 ===== */
+  .overlay{position:fixed;inset:0;background:rgba(35,25,60,.55);backdrop-filter:blur(4px);display:none;place-items:center;z-index:50;padding:16px;}
+  .overlay.show{display:grid;}
+  .winner-card{
+    background:#fff;border-radius:32px;padding:36px 56px 32px;text-align:center;max-width:95vw;
+    box-shadow:0 20px 60px rgba(0,0,0,.25);animation:pop .55s cubic-bezier(.2,1.5,.4,1) both;
+  }
+  .winner-card .label{font-size:1.6rem;font-weight:900;color:var(--primary);}
+  .winner-name{
+    font-size:clamp(3.5rem,11vw,9rem);font-weight:900;line-height:1.15;margin:.15em 0 .2em;word-break:keep-all;
+    background:linear-gradient(90deg,#FF5A5F,#FF9F45,#3D7BFF,#9B5DE5);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .winner-card .btn{font-size:1.3rem;padding:.6em 2em;}
+  @keyframes pop{from{opacity:0;transform:scale(.6);}to{opacity:1;transform:scale(1);}}
+
+  /* 꽃가루 캔버스 */
+  #confetti{position:fixed;inset:0;pointer-events:none;z-index:60;}
+
+  /* 알림 메시지 */
+  .toast{
+    position:fixed;left:50%;bottom:32px;transform:translateX(-50%) translateY(20px);
+    background:var(--ink);color:#fff;font-weight:800;font-size:1.1rem;padding:.8em 1.4em;border-radius:14px;
+    opacity:0;pointer-events:none;transition:all .25s;z-index:70;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- 상단 바 -->
+  <header>
+    <h1>🎡 룰렛 추첨기<span class="dot">.</span></h1>
+    <div class="hdr-actions">
+      <button class="btn" id="toggleList">📋 명단 접기</button>
+      <button class="btn" id="fontDown" title="글씨 작게">가−</button>
+      <button class="btn" id="fontUp" title="글씨 크게">가+</button>
+      <button class="btn" id="fsBtn">⛶ 전체 화면</button>
+    </div>
+  </header>
+
+  <div class="layout" id="layout">
+    <!-- 왼쪽: 명단 입력 -->
+    <aside class="card">
+      <h2>참가자 명단</h2>
+      <p class="hint">이름을 한 줄에 하나씩 입력하거나 붙여넣으세요.<br>엑셀에서 복사한 목록도 인식합니다.</p>
+      <textarea id="names" spellcheck="false" placeholder="홍길동&#10;김철수&#10;이영희"></textarea>
+      <div class="count-row">
+        <div>
+          <div class="count">총 <b id="total">0</b>명</div>
+          <div class="dup" id="dupInfo"></div>
+        </div>
+        <div class="small-btns">
+          <button class="btn" id="sampleBtn">예시</button>
+          <button class="btn" id="clearBtn">지우기</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- 오른쪽: 기능 -->
+    <main>
+      <div class="tabs">
+        <button class="tab active" data-tab="pick">🎯 발표자 뽑기</button>
+        <button class="tab" data-tab="team">👥 조 편성</button>
+      </div>
+
+      <!-- 발표자 뽑기 -->
+      <section class="panel active" id="panel-pick">
+        <div class="card roulette">
+          <div>
+            <div class="wheel-box" id="wheelBox"><canvas id="wheel"></canvas></div>
+            <div class="live" id="live">&nbsp;</div>
+          </div>
+          <div class="controls">
+            <button class="btn btn-primary btn-big" id="spinBtn">🎯 발표자 뽑기</button>
+            <label class="check"><input type="checkbox" id="excludeChk" checked> 이미 뽑힌 사람 제외</label>
+            <label class="check"><input type="checkbox" id="soundChk" checked> 효과음</label>
+            <div class="remain">남은 후보 <b id="remain">0</b>명</div>
+            <div class="history">
+              <h3>뽑힌 순서 <button class="btn" id="resetPicked">기록 초기화</button></h3>
+              <div class="chips" id="chips"><span class="empty">아직 뽑힌 사람이 없습니다.</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 조 편성 -->
+      <section class="panel" id="panel-team">
+        <div class="card" style="margin-bottom:16px;">
+          <div class="team-bar">
+            <div class="seg">
+              <label><input type="radio" name="mode" value="count" checked><span>N개 조로 나누기</span></label>
+              <label><input type="radio" name="mode" value="size"><span>N명씩 나누기</span></label>
+            </div>
+            <div class="stepper">
+              <button id="numDown" aria-label="줄이기">−</button>
+              <input type="number" id="numInput" value="4" min="1">
+              <span id="numUnit">개 조</span>
+              <button id="numUp" aria-label="늘리기">+</button>
+            </div>
+            <div class="team-actions">
+              <button class="btn btn-blue" id="teamBtn">👥 조 편성하기</button>
+              <button class="btn" id="reshuffleBtn" disabled>🔀 다시 섞기</button>
+              <button class="btn btn-green" id="copyBtn" disabled>📋 복사</button>
+            </div>
+          </div>
+        </div>
+        <p class="summary" id="summary"></p>
+        <div class="teams" id="teams">
+          <div class="card team-empty" style="grid-column:1/-1;">[조 편성하기]를 누르면 결과가 여기에 표시됩니다.</div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<!-- 당첨자 발표 -->
+<div class="overlay" id="overlay">
+  <div class="winner-card">
+    <div class="label">🎉 축하합니다! 🎉</div>
+    <div class="winner-name" id="winnerName"></div>
+    <button class="btn btn-primary" id="closeOverlay">확인</button>
+  </div>
+</div>
+
+<canvas id="confetti"></canvas>
+<div class="toast" id="toast"></div>
+
+<script>
+/* =========================================================
+   교육장 룰렛 추첨기
+   - 명단 입력 / 룰렛 추첨 / 조 편성 / 복사 / 전체 화면
+   ========================================================= */
+
+// ===== 상수 =====
+const TAU = Math.PI * 2;
+const SAMPLE_NAMES = ['김민준','이서연','박지호','최수아','정도윤','강하은','조시우','윤지유','장예준','임서윤','한주원','오채원'];
+
+// 룰렛 칸 색상 (배경색 / 글자색)
+const PALETTE = [
+  {bg:'#FF6B6B', fg:'#fff'},
+  {bg:'#FFC93C', fg:'#3A2E00'},
+  {bg:'#4ECB71', fg:'#fff'},
+  {bg:'#4D96FF', fg:'#fff'},
+  {bg:'#FF9F45', fg:'#fff'},
+  {bg:'#B37FEB', fg:'#fff'},
+  {bg:'#2EC4B6', fg:'#fff'},
+  {bg:'#FF8FAB', fg:'#fff'},
+  {bg:'#A3E048', fg:'#2B3A00'},
+  {bg:'#5ECFFF', fg:'#003A52'},
+];
+
+// ===== 상태 =====
+let names = [];        // 현재 명단
+let picked = [];       // 뽑힌 사람 (순서대로)
+let wheelList = [];    // 룰렛에 그려지는 목록
+let rotation = 0;      // 룰렛 회전 각도(라디안)
+let spinning = false;  // 회전 중 여부
+let wheelSize = 400;   // 룰렛 표시 크기(px)
+let teams = null;      // 조 편성 결과
+let fontPx = 18;       // 기준 글씨 크기
+
+// ===== 요소 =====
+const $ = id => document.getElementById(id);
+const namesEl = $('names');
+const canvas = $('wheel');
+const ctx = canvas.getContext('2d');
+
+/* ---------------------------------------------------------
+   유틸리티
+   --------------------------------------------------------- */
+// 암호학적 난수로 0 ~ n-1 정수 생성
+function randInt(n){
+  const a = new Uint32Array(1);
+  crypto.getRandomValues(a);
+  return a[0] % n;
+}
+// 피셔-예이츠 섞기
+function shuffle(arr){
+  for(let i = arr.length - 1; i > 0; i--){
+    const j = randInt(i + 1);
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+// 각도를 0 ~ 2π 범위로 정규화
+const norm = a => ((a % TAU) + TAU) % TAU;
+
+// 알림 메시지
+let toastTimer;
+function toast(msg){
+  const t = $('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+// HTML 특수문자 처리
+function esc(s){
+  return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* ---------------------------------------------------------
+   명단 처리
+   --------------------------------------------------------- */
+// 입력 텍스트를 이름 목록으로 변환 (엑셀 복사 대응)
+function parseNames(text){
+  const lines = text.replace(/\r/g, '').split('\n').filter(l => l.trim());
+  let raw = [];
+  // 숫자만 있는 칸(번호 열)은 이름으로 보지 않음
+  const isName = c => c.trim() && !/^\d+\.?$/.test(c.trim());
+
+  if(lines.length === 1 && lines[0].includes('\t')){
+    // 엑셀에서 가로 한 줄을 복사한 경우: 모든 칸을 이름으로
+    raw = lines[0].split('\t').filter(isName);
+  }else{
+    // 세로 목록: 각 줄에서 첫 번째 이름 칸만 사용 (번호·부서 열 무시)
+    raw = lines.map(l => l.split('\t').find(isName) || '');
+  }
+  // 앞뒤 공백·따옴표 제거
+  raw = raw.map(s => s.trim().replace(/^"+|"+$/g, '').trim()).filter(Boolean);
+
+  // 중복 제거
+  const seen = new Set();
+  const list = [];
+  let dup = 0;
+  for(const n of raw){
+    if(seen.has(n)){ dup++; continue; }
+    seen.add(n);
+    list.push(n);
+  }
+  return {list, dup};
+}
+
+// 명단이 바뀌면 화면 전체 갱신
+function onNamesChange(){
+  const {list, dup} = parseNames(namesEl.value);
+  names = list;
+  picked = picked.filter(n => names.includes(n)); // 명단에서 빠진 사람은 기록에서도 제거
+  $('total').textContent = names.length;
+  $('dupInfo').textContent = dup ? `중복 ${dup}명은 제외했습니다` : '';
+  refreshWheel();
+  renderChips();
+}
+
+// 추첨 후보 (제외 옵션 반영)
+function candidates(){
+  return $('excludeChk').checked ? names.filter(n => !picked.includes(n)) : names.slice();
+}
+
+/* ---------------------------------------------------------
+   룰렛 그리기
+   --------------------------------------------------------- */
+// 캔버스 크기를 화면에 맞추고 고해상도 대응
+function resizeCanvas(){
+  const w = Math.floor($('wheelBox').getBoundingClientRect().width);
+  if(!w) return;
+  const dpr = window.devicePixelRatio || 1;
+  wheelSize = w;
+  canvas.style.width = canvas.style.height = w + 'px';
+  canvas.width = canvas.height = Math.floor(w * dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  drawWheel();
+}
+
+// 칸별 색상 (첫 칸과 마지막 칸이 같은 색이 되지 않게)
+function colorAt(i, n){
+  let idx = i % PALETTE.length;
+  if(i === n - 1 && n > 1 && idx === 0) idx = 2;
+  return PALETTE[idx];
+}
+
+function drawWheel(){
+  const S = wheelSize, c = S / 2, R = c - 16;
+  ctx.clearRect(0, 0, S, S);
+
+  // 바깥 테두리
+  ctx.save();
+  ctx.shadowColor = 'rgba(80,50,10,.18)';
+  ctx.shadowBlur = 18;
+  ctx.shadowOffsetY = 6;
+  ctx.beginPath();
+  ctx.arc(c, c, R + 10, 0, TAU);
+  ctx.fillStyle = '#2B2D42';
+  ctx.fill();
+  ctx.restore();
+
+  const list = wheelList;
+  const n = list.length;
+
+  if(n === 0){
+    // 후보가 없을 때
+    ctx.beginPath();
+    ctx.arc(c, c, R, 0, TAU);
+    ctx.fillStyle = '#F3EEE6';
+    ctx.fill();
+    ctx.fillStyle = '#7A7F95';
+    ctx.font = `800 ${Math.round(S * 0.05)}px ${getComputedStyle(document.body).fontFamily}`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(names.length ? '모두 뽑혔습니다!' : '이름을 입력하세요', c, c + R * 0.42);
+  }else{
+    const seg = TAU / n;
+    const family = getComputedStyle(document.body).fontFamily;
+    // 칸 수에 따라 글씨 크기 자동 조절
+    const fontSize = Math.max(10, Math.min(R * 0.11, seg * R * 0.5));
+
+    for(let i = 0; i < n; i++){
+      const start = rotation + i * seg;
+      const col = colorAt(i, n);
+
+      // 칸
+      ctx.beginPath();
+      ctx.moveTo(c, c);
+      ctx.arc(c, c, R, start, start + seg);
+      ctx.closePath();
+      ctx.fillStyle = col.bg;
+      ctx.fill();
+      if(n > 1){
+        ctx.strokeStyle = 'rgba(255,255,255,.9)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      }
+
+      // 이름 (바깥쪽에서 안쪽으로)
+      ctx.save();
+      ctx.translate(c, c);
+      ctx.rotate(start + seg / 2);
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'middle';
+      ctx.font = `900 ${fontSize}px ${family}`;
+      ctx.fillStyle = col.fg;
+      let label = list[i];
+      const maxW = R * 0.68;
+      // 너무 길면 말줄임
+      while(ctx.measureText(label).width > maxW && label.length > 1){
+        label = label.slice(0, -1);
+        if(ctx.measureText(label + '…').width <= maxW){ label += '…'; break; }
+      }
+      ctx.fillText(label, R - 18, 0);
+      ctx.restore();
+    }
+
+    // 테두리 장식 점
+    const dots = Math.max(12, Math.min(36, n * 2));
+    for(let i = 0; i < dots; i++){
+      const a = rotation + (i / dots) * TAU;
+      ctx.beginPath();
+      ctx.arc(c + Math.cos(a) * (R + 5), c + Math.sin(a) * (R + 5), Math.max(2, S * 0.006), 0, TAU);
+      ctx.fillStyle = i % 2 ? '#FFC93C' : '#fff';
+      ctx.fill();
+    }
+  }
+
+  // 가운데 버튼
+  const hub = R * 0.17;
+  ctx.beginPath();
+  ctx.arc(c, c, hub + 6, 0, TAU);
+  ctx.fillStyle = '#2B2D42';
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(c, c, hub, 0, TAU);
+  ctx.fillStyle = '#fff';
+  ctx.fill();
+  ctx.fillStyle = '#FF5A5F';
+  ctx.font = `900 ${Math.round(hub * 0.55)}px ${getComputedStyle(document.body).fontFamily}`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('뽑기', c, c + 1);
+
+  // 위쪽 고정 화살표
+  const pw = S * 0.045, ph = S * 0.085;
+  ctx.save();
+  ctx.shadowColor = 'rgba(0,0,0,.25)';
+  ctx.shadowBlur = 6;
+  ctx.beginPath();
+  ctx.moveTo(c - pw, 2);
+  ctx.lineTo(c + pw, 2);
+  ctx.lineTo(c, ph);
+  ctx.closePath();
+  ctx.fillStyle = '#FF5A5F';
+  ctx.fill();
+  ctx.restore();
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = '#fff';
+  ctx.stroke();
+}
+
+// 회전 중이 아닐 때 룰렛 목록 갱신
+function refreshWheel(){
+  if(spinning) return;
+  wheelList = candidates();
+  $('remain').textContent = candidates().length;
+  drawWheel();
+}
+
+// 화살표가 가리키는 칸 번호
+function pointerIndex(){
+  const n = wheelList.length;
+  if(!n) return -1;
+  const seg = TAU / n;
+  // 화살표는 위쪽(3π/2 방향)에 있음
+  return Math.floor(norm(1.5 * Math.PI - rotation) / seg) % n;
+}
+
+/* ---------------------------------------------------------
+   효과음 (Web Audio)
+   --------------------------------------------------------- */
+let audioCtx = null;
+function beep(freq, dur, type = 'triangle', vol = 0.08){
+  if(!$('soundChk').checked) return;
+  try{
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.type = type;
+    o.frequency.value = freq;
+    g.gain.setValueAtTime(vol, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + dur);
+    o.connect(g).connect(audioCtx.destination);
+    o.start();
+    o.stop(audioCtx.currentTime + dur);
+  }catch(e){ /* 소리 재생 실패는 무시 */ }
+}
+const tick = () => beep(1100, 0.035, 'square', 0.03);
+function fanfare(){
+  [523, 659, 784, 1047].forEach((f, i) => setTimeout(() => beep(f, 0.3, 'triangle', 0.12), i * 130));
+}
+
+/* ---------------------------------------------------------
+   룰렛 돌리기
+   --------------------------------------------------------- */
+function spin(){
+  if(spinning) return;
+  const list = candidates();
+  if(list.length === 0){
+    toast(names.length ? '모두 뽑혔습니다. [기록 초기화]를 눌러 주세요.' : '먼저 이름을 입력해 주세요.');
+    return;
+  }
+
+  spinning = true;
+  $('spinBtn').disabled = true;
+  wheelList = list;
+  drawWheel();
+
+  // 당첨자를 먼저 정하고, 그 칸에서 멈추도록 목표 각도 계산
+  const n = list.length;
+  const seg = TAU / n;
+  const winIdx = randInt(n);
+  const offset = 0.15 + Math.random() * 0.7;          // 칸 경계에 걸리지 않도록 칸 안쪽 임의 위치
+  const target = 1.5 * Math.PI - (winIdx + offset) * seg;
+  const turns = 6 + randInt(3);                       // 6~8바퀴
+  const start = rotation;
+  const end = rotation + turns * TAU + norm(target - rotation);
+  const duration = 5500 + Math.random() * 1500;       // 5.5~7초
+  const t0 = performance.now();
+  let lastIdx = pointerIndex();
+
+  function frame(now){
+    const t = Math.min(1, (now - t0) / duration);
+    // 감속 곡선 (처음엔 빠르게, 끝으로 갈수록 서서히)
+    const eased = 1 - Math.pow(1 - t, 4);
+    rotation = start + (end - start) * eased;
+    drawWheel();
+
+    // 칸이 바뀔 때마다 '틱' 소리와 현재 이름 표시
+    const idx = pointerIndex();
+    if(idx !== lastIdx){
+      lastIdx = idx;
+      tick();
+      $('live').textContent = list[idx];
+    }
+
+    if(t < 1){
+      requestAnimationFrame(frame);
+    }else{
+      rotation = norm(rotation);
+      finishSpin(list[winIdx]);
+    }
+  }
+  requestAnimationFrame(frame);
+}
+
+// 멈춘 뒤 당첨자 발표
+function finishSpin(winner){
+  $('live').textContent = '🎉 ' + winner;
+  if(!picked.includes(winner)) picked.push(winner);
+  renderChips();
+
+  $('winnerName').textContent = winner;
+  $('overlay').classList.add('show');
+  fanfare();
+  launchConfetti();
+
+  spinning = false;
+  $('spinBtn').disabled = false;
+  $('remain').textContent = candidates().length;
+}
+
+// 발표 화면 닫기 → 룰렛에서 당첨자 제외 반영
+function closeOverlay(){
+  if(!$('overlay').classList.contains('show')) return;
+  $('overlay').classList.remove('show');
+  refreshWheel();
+}
+
+// 뽑힌 기록 표시
+function renderChips(){
+  const box = $('chips');
+  if(!picked.length){
+    box.innerHTML = '<span class="empty">아직 뽑힌 사람이 없습니다.</span>';
+  }else{
+    box.innerHTML = picked.map((n, i) => `<span class="chip"><i>${i + 1}</i>${esc(n)}</span>`).join('');
+  }
+  $('remain').textContent = candidates().length;
+}
+
+/* ---------------------------------------------------------
+   꽃가루 효과
+   --------------------------------------------------------- */
+const cf = $('confetti');
+const cctx = cf.getContext('2d');
+const CONFETTI_COLORS = ['#FF5A5F','#FFC93C','#4ECB71','#4D96FF','#FF9F45','#B37FEB','#2EC4B6','#FF8FAB'];
+let particles = [];
+let confettiOn = false;
+
+function resizeConfetti(){
+  const dpr = window.devicePixelRatio || 1;
+  cf.width = innerWidth * dpr;
+  cf.height = innerHeight * dpr;
+  cctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+
+function makeParticle(x, y, vx, vy){
+  return {
+    x, y, vx, vy,
+    w: 7 + Math.random() * 7,
+    h: 10 + Math.random() * 10,
+    rot: Math.random() * TAU,
+    vr: (Math.random() - 0.5) * 0.35,
+    color: CONFETTI_COLORS[randInt(CONFETTI_COLORS.length)],
+    circle: Math.random() < 0.25
+  };
+}
+
+function launchConfetti(){
+  const W = innerWidth, H = innerHeight;
+  // 화면 양쪽 아래에서 위로 쏘아 올리기
+  for(let i = 0; i < 160; i++){
+    const left = i % 2 === 0;
+    particles.push(makeParticle(
+      left ? -10 : W + 10, H * 0.8,
+      (left ? 1 : -1) * (6 + Math.random() * 14),
+      -(14 + Math.random() * 16)
+    ));
+  }
+  // 위에서 쏟아지기
+  for(let i = 0; i < 120; i++){
+    particles.push(makeParticle(Math.random() * W, -20 - Math.random() * H * 0.5, (Math.random() - 0.5) * 3, 2 + Math.random() * 4));
+  }
+  if(!confettiOn){
+    confettiOn = true;
+    requestAnimationFrame(confettiLoop);
+  }
+}
+
+function confettiLoop(){
+  cctx.clearRect(0, 0, innerWidth, innerHeight);
+  for(const p of particles){
+    // 중력 + 공기 저항 + 좌우 흔들림
+    p.vy = p.vy * 0.97 + 0.32;
+    p.vx = p.vx * 0.97 + Math.sin(p.rot) * 0.08;
+    p.x += p.vx;
+    p.y += p.vy;
+    p.rot += p.vr;
+
+    cctx.save();
+    cctx.translate(p.x, p.y);
+    cctx.rotate(p.rot);
+    cctx.fillStyle = p.color;
+    if(p.circle){
+      cctx.beginPath();
+      cctx.arc(0, 0, p.w / 2, 0, TAU);
+      cctx.fill();
+    }else{
+      // 종이가 뒤집히는 느낌을 위해 폭을 주기적으로 변화
+      const w = p.w * Math.cos(p.rot * 2);
+      cctx.fillRect(-w / 2, -p.h / 2, w, p.h);
+    }
+    cctx.restore();
+  }
+  particles = particles.filter(p => p.y < innerHeight + 40);
+  if(particles.length){
+    requestAnimationFrame(confettiLoop);
+  }else{
+    confettiOn = false;
+    cctx.clearRect(0, 0, innerWidth, innerHeight);
+  }
+}
+
+/* ---------------------------------------------------------
+   조 편성
+   --------------------------------------------------------- */
+const getMode = () => document.querySelector('input[name="mode"]:checked').value;
+
+function makeTeams(){
+  const n = names.length;
+  if(n < 2){ toast('조 편성은 2명 이상부터 가능합니다.'); return; }
+
+  let v = parseInt($('numInput').value, 10);
+  if(!v || v < 1){ v = 1; $('numInput').value = 1; }
+
+  // 조 개수 결정
+  let k;
+  if(getMode() === 'count'){
+    k = Math.min(v, n);
+    if(v > n) toast(`인원이 ${n}명이라 ${n}개 조로 나눕니다.`);
+  }else{
+    k = Math.max(1, Math.floor(n / v));
+  }
+
+  // 무작위로 섞은 뒤, 남는 인원은 앞 조부터 한 명씩 더 배치
+  const list = shuffle(names.slice());
+  const base = Math.floor(n / k);
+  const rem = n % k;
+  teams = [];
+  let p = 0;
+  for(let i = 0; i < k; i++){
+    const size = base + (i < rem ? 1 : 0);
+    teams.push(list.slice(p, p + size));
+    p += size;
+  }
+  renderTeams();
+  $('reshuffleBtn').disabled = false;
+  $('copyBtn').disabled = false;
+}
+
+function renderTeams(){
+  const sizes = teams.map(t => t.length);
+  $('summary').innerHTML = `총 <b>${names.length}명</b> → <b>${teams.length}개 조</b> (${sizes.join(' · ')}명)`;
+  $('teams').innerHTML = teams.map((t, i) => {
+    const col = PALETTE[i % PALETTE.length];
+    return `<div class="team" style="animation-delay:${i * 60}ms">
+      <div class="team-head" style="background:${col.bg};color:${col.fg}">
+        ${i + 1}조 <small>${t.length}명</small>
+      </div>
+      <ul>${t.map(n => `<li>${esc(n)}</li>`).join('')}</ul>
+    </div>`;
+  }).join('');
+}
+
+// 메신저용 텍스트로 복사
+async function copyTeams(){
+  if(!teams) return;
+  const text = `[조 편성 결과] 총 ${names.length}명 · ${teams.length}개 조\n` +
+    teams.map((t, i) => `${i + 1}조 (${t.length}명): ${t.join(', ')}`).join('\n');
+  let ok = false;
+  try{
+    await navigator.clipboard.writeText(text);
+    ok = true;
+  }catch(e){
+    // 클립보드 API를 쓸 수 없는 환경(파일로 연 경우 등) 대비
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try{ ok = document.execCommand('copy'); }catch(_){}
+    ta.remove();
+  }
+  toast(ok ? '복사했습니다. 메신저에 붙여넣으세요.' : '복사에 실패했습니다.');
+}
+
+// 모드에 따라 단위 문구 변경
+function updateUnit(){
+  $('numUnit').textContent = getMode() === 'count' ? '개 조' : '명씩';
+}
+
+/* ---------------------------------------------------------
+   화면 설정 (전체 화면, 글씨 크기, 명단 접기)
+   --------------------------------------------------------- */
+function toggleFullscreen(){
+  if(!document.fullscreenElement){
+    const req = document.documentElement.requestFullscreen;
+    if(req) document.documentElement.requestFullscreen().catch(() => toast('전체 화면을 사용할 수 없습니다.'));
+    else toast('이 브라우저는 전체 화면을 지원하지 않습니다.');
+  }else{
+    document.exitFullscreen();
+  }
+}
+document.addEventListener('fullscreenchange', () => {
+  $('fsBtn').textContent = document.fullscreenElement ? '⛶ 전체 화면 끄기' : '⛶ 전체 화면';
+});
+
+function setFont(px){
+  fontPx = Math.max(14, Math.min(30, px));
+  document.documentElement.style.setProperty('--fs', fontPx + 'px');
+  setTimeout(resizeCanvas, 50);
+}
+
+/* ---------------------------------------------------------
+   이벤트 연결
+   --------------------------------------------------------- */
+namesEl.addEventListener('input', onNamesChange);
+$('sampleBtn').onclick = () => { namesEl.value = SAMPLE_NAMES.join('\n'); picked = []; onNamesChange(); };
+$('clearBtn').onclick = () => { namesEl.value = ''; picked = []; onNamesChange(); namesEl.focus(); };
+
+$('spinBtn').onclick = spin;
+canvas.onclick = spin;
+$('excludeChk').onchange = refreshWheel;
+$('resetPicked').onclick = () => { picked = []; renderChips(); refreshWheel(); $('live').innerHTML = '&nbsp;'; toast('뽑힌 기록을 초기화했습니다.'); };
+$('closeOverlay').onclick = closeOverlay;
+$('overlay').onclick = e => { if(e.target.id === 'overlay') closeOverlay(); };
+
+$('teamBtn').onclick = makeTeams;
+$('reshuffleBtn').onclick = makeTeams;
+$('copyBtn').onclick = copyTeams;
+$('numDown').onclick = () => { $('numInput').value = Math.max(1, (parseInt($('numInput').value, 10) || 1) - 1); };
+$('numUp').onclick = () => { $('numInput').value = (parseInt($('numInput').value, 10) || 0) + 1; };
+document.querySelectorAll('input[name="mode"]').forEach(r => r.onchange = updateUnit);
+
+$('fsBtn').onclick = toggleFullscreen;
+$('fontUp').onclick = () => setFont(fontPx + 2);
+$('fontDown').onclick = () => setFont(fontPx - 2);
+$('toggleList').onclick = () => {
+  const c = $('layout').classList.toggle('collapsed');
+  $('toggleList').textContent = c ? '📋 명단 펼치기' : '📋 명단 접기';
+};
+
+// 탭 전환
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.onclick = () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t === tab));
+    document.querySelectorAll('.panel').forEach(p => p.classList.toggle('active', p.id === 'panel-' + tab.dataset.tab));
+    if(tab.dataset.tab === 'pick') resizeCanvas();
+  };
+});
+
+// 키보드: 스페이스/엔터로 돌리기, ESC로 발표 화면 닫기
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape'){ closeOverlay(); return; }
+  const typing = ['TEXTAREA', 'INPUT'].includes(document.activeElement.tagName);
+  if($('overlay').classList.contains('show') && (e.key === 'Enter' || e.key === ' ')){
+    e.preventDefault(); closeOverlay(); return;
+  }
+  if(!typing && (e.key === ' ' || e.key === 'Enter') && $('panel-pick').classList.contains('active')){
+    e.preventDefault(); spin();
+  }
+});
+
+// 크기 변경 대응
+new ResizeObserver(resizeCanvas).observe($('wheelBox'));
+window.addEventListener('resize', resizeConfetti);
+
+/* ---------------------------------------------------------
+   초기화: 예시 이름 12명
+   --------------------------------------------------------- */
+namesEl.value = SAMPLE_NAMES.join('\n');
+resizeConfetti();
+onNamesChange();
+resizeCanvas();
+</script>
+</body>
+</html>
+
+</body></html>

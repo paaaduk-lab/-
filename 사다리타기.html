@@ -1,0 +1,404 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>사다리타기</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<style>
+/* Layout: warm orange graph-paper sheet; setup card on top, ladder board below with name chips aligned to the canvas columns */
+:root{
+  --bg:#fff4ea; --grid:#fde3cc; --paper:#fffaf5; --fg:#3a2412; --muted:#8a6448;
+  --line:#5c3417; --accent:#f07a1a; --accent-fg:#ffffff; --chip:#fff0e2; --border:#f5cfae;
+  --veil:#ffe2c7; --c0:#e5484d; --c1:#2f6fe4; --c2:#12a36b; --c3:#c2410c; --c4:#8e4ec6; --c5:#0f9fb3; --c6:#d6409f; --c7:#6b8e23; --c8:#b45309; --c9:#4a5bd4;
+  --display:"Jua","Noto Sans KR",system-ui,sans-serif;
+  --body:"Noto Sans KR",system-ui,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#1c130c; --grid:#2a1c11; --paper:#251912; --fg:#fbe9da; --muted:#c49a7a;
+  --line:#f1c9a5; --accent:#ff9a3d; --accent-fg:#241306; --chip:#33231a; --border:#4a3224;
+  --veil:#3a2618; --c0:#ff6b70; --c1:#6a9bff; --c2:#3ccf91; --c3:#ff8a4c; --c4:#b787ec; --c5:#3fcbe0; --c6:#f07cc2; --c7:#a3c55a; --c8:#f5b54a; --c9:#8a97ff;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#1c130c; --grid:#2a1c11; --paper:#251912; --fg:#fbe9da; --muted:#c49a7a;
+  --line:#f1c9a5; --accent:#ff9a3d; --accent-fg:#241306; --chip:#33231a; --border:#4a3224;
+  --veil:#3a2618; --c0:#ff6b70; --c1:#6a9bff; --c2:#3ccf91; --c3:#ff8a4c; --c4:#b787ec; --c5:#3fcbe0; --c6:#f07cc2; --c7:#a3c55a; --c8:#f5b54a; --c9:#8a97ff;
+  color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:24px 24px;}
+.wrap{max-width:880px;margin:0 auto;padding-block:28px 48px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:flex;flex-direction:column;gap:20px}
+.title{display:flex;align-items:center;gap:10px}
+.buddy{width:52px;height:52px;flex:none;color:var(--fg);animation:bob 2.4s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-5px) rotate(4deg)}}
+header h1{font-family:var(--display);font-weight:400;font-size:2.4rem;margin:0;letter-spacing:.02em;text-wrap:balance}
+header p{margin:4px 0 0;color:var(--muted)}
+.card{background:var(--paper);border:1px solid var(--border);border-radius:14px;padding:18px}
+.setup-head{display:flex;flex-wrap:wrap;align-items:center;gap:12px;justify-content:space-between;margin-bottom:14px}
+.setup-head h2{font-family:var(--display);font-weight:400;font-size:1.3rem;margin:0}
+.stepper{display:flex;align-items:center;gap:8px}
+.stepper span{min-width:3.5em;text-align:center;font-weight:700;font-variant-numeric:tabular-nums}
+button{font:inherit;cursor:pointer;border-radius:10px;border:1px solid var(--border);background:var(--chip);color:var(--fg);padding:8px 14px}
+button:hover{border-color:var(--accent)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button.primary{background:var(--accent);color:var(--accent-fg);border-color:var(--accent);font-weight:700}
+button.sq{width:36px;height:36px;padding:0;font-size:1.2rem;line-height:1}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px}
+.fields .lab{font-size:.78rem;color:var(--muted);letter-spacing:.06em}
+.fields input{width:100%;box-sizing:border-box;font:inherit;padding:7px 10px;border-radius:8px;border:1px solid var(--border);background:var(--chip);color:var(--fg);min-width:0}
+.row{display:contents}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;align-items:center}
+.actions label{display:flex;align-items:center;gap:6px;color:var(--muted);margin-left:auto}
+.board{padding:16px 10px}
+.chips{display:grid;gap:4px}
+.chip{font-family:var(--display);font-size:1rem;text-align:center;padding:8px 2px;border-radius:10px;border:2px solid var(--border);
+  background:var(--chip);color:var(--fg);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+button.chip{padding:8px 2px}
+.chip.done{color:#fff;border-color:transparent}
+.res.hidden-r{color:var(--muted)}
+canvas{display:block;width:100%;height:380px}
+.hint{text-align:center;color:var(--muted);font-size:.9rem;margin:10px 0 0}
+.summary h2{font-family:var(--display);font-weight:400;font-size:1.3rem;margin:0 0 10px}
+.summary ol{margin:0;padding-left:1.4em;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px 20px}
+.summary li{font-variant-numeric:tabular-nums}
+.summary li b{font-weight:700}
+.empty{color:var(--muted);margin:0}
+@media (max-width:520px){.title{display:flex;align-items:center;gap:10px}
+.buddy{width:52px;height:52px;flex:none;color:var(--fg);animation:bob 2.4s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-5px) rotate(4deg)}}
+header h1{font-size:2rem}.chip{font-size:.85rem}canvas{height:320px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="title"><svg class="buddy" viewBox="0 0 40 40" aria-hidden="true"><ellipse cx="20" cy="38" rx="11" ry="2" fill="currentColor" opacity=".15"/><rect x="19" y="5" width="2" height="5" fill="#6b4a1e"/><ellipse cx="26" cy="7" rx="6" ry="2.8" transform="rotate(-28 26 7)" fill="#3fa34d"/><ellipse cx="20" cy="22" rx="14" ry="13" fill="#f57c0f" stroke="#a9500b" stroke-width="1.5"/><circle cx="15.5" cy="20" r="2" fill="#3a1d06"/><circle cx="24.5" cy="20" r="2" fill="#3a1d06"/><ellipse cx="11.5" cy="24" rx="2.6" ry="1.6" fill="#ff5a5a" opacity=".55"/><ellipse cx="28.5" cy="24" rx="2.6" ry="1.6" fill="#ff5a5a" opacity=".55"/><path d="M17.5 24.5q2.5 2.5 5 0" stroke="#3a1d06" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg><h1>사다리타기</h1></div>
+    <p>참가자와 결과를 입력하고, 위쪽 이름을 누르면 귤이가 사다리를 따라 내려갑니다.</p>
+  </header>
+
+  <section class="card">
+    <div class="setup-head">
+      <h2>설정</h2>
+      <div class="stepper" aria-label="인원 수">
+        <button class="sq" id="minus" aria-label="인원 줄이기">−</button>
+        <span id="count">6명</span>
+        <button class="sq" id="plus" aria-label="인원 늘리기">+</button>
+      </div>
+    </div>
+    <div class="fields" id="fields"></div>
+    <div class="actions">
+      <button class="primary" id="build">사다리 새로 만들기</button>
+      <button id="all">전체 결과 보기</button>
+      <button id="reset">경로 지우기</button>
+      <label><input type="checkbox" id="blurOn" checked> 가운데 가리기</label>
+      <label style="margin-left:0"><input type="checkbox" id="hide" checked> 결과 가리기</label>
+    </div>
+  </section>
+
+  <section class="card board">
+    <div class="chips" id="top"></div>
+    <canvas id="cv" aria-label="사다리"></canvas>
+    <div class="chips" id="bottom"></div>
+    <p class="hint">이름을 눌러 한 명씩 확인하세요.</p>
+  </section>
+
+  <section class="card summary">
+    <h2>결과</h2>
+    <p class="empty" id="empty">아직 확인한 사람이 없습니다.</p>
+    <ol id="list"></ol>
+  </section>
+</div>
+
+<script>
+const ROWS = 12;
+const sampleNames = ["김민준","이서연","박지훈","최유진","정하늘","강도윤","윤소희","임재현","한예린","오태양"];
+const sampleRes = ["커피 쏘기","통과","통과","간식 담당","통과","점심 당첨","통과","꽝","통과","통과"];
+let n = 6;
+let names = sampleNames.slice(0, 10);
+let results = sampleRes.slice(0, 10);
+let rungs = [];            // rungs[r][g] true = bridge between column g and g+1 at row r
+let traces = {};           // start col -> {pts, len, prog, end}
+let hide = true;
+let blurOn = true;
+const off = document.createElement("canvas"), octx = off.getContext("2d");
+
+const $ = id => document.getElementById(id);
+const cv = $("cv"), ctx = cv.getContext("2d");
+
+function css(v){ return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+function color(i){ return css("--c" + (i % 10)); }
+
+function renderFields(){
+  const f = $("fields");
+  f.innerHTML = '<div class="lab">참가자</div><div class="lab">결과</div>';
+  for (let i = 0; i < n; i++){
+    const a = document.createElement("input");
+    a.id = "name" + i; a.value = names[i]; a.maxLength = 12; a.setAttribute("aria-label", `참가자 ${i+1}`);
+    a.addEventListener("input", () => { names[i] = a.value; renderChips(); renderList(); });
+    const b = document.createElement("input");
+    b.id = "res" + i; b.value = results[i]; b.maxLength = 12; b.setAttribute("aria-label", `결과 ${i+1}`);
+    b.addEventListener("input", () => { results[i] = b.value; renderChips(); renderList(); });
+    f.append(a, b);
+  }
+  $("count").textContent = n + "명";
+  $("minus").disabled = n <= 2; $("plus").disabled = n >= 10;
+}
+
+function generate(){
+  rungs = [];
+  for (let r = 0; r < ROWS; r++){
+    const row = [];
+    for (let g = 0; g < n - 1; g++){
+      row.push(!(g > 0 && row[g-1]) && Math.random() < 0.38);
+    }
+    rungs.push(row);
+  }
+  // make sure every gap has at least two bridges so nobody walks straight down
+  for (let g = 0; g < n - 1; g++){
+    let tries = 0;
+    while (rungs.filter(row => row[g]).length < 2 && tries++ < 50){
+      const r = Math.floor(Math.random() * ROWS);
+      if (!rungs[r][g-1] && !rungs[r][g+1]) rungs[r][g] = true;
+    }
+  }
+  traces = {};
+}
+
+function geom(){
+  const w = cv.clientWidth, h = cv.clientHeight;
+  const colX = i => (i + 0.5) * w / n;
+  const top = 26, bot = h - 24;
+  const rowY = r => top + (r + 1) * (bot - top) / (ROWS + 1);
+  return {w, h, colX, rowY, top, bot};
+}
+
+function pathFor(start){
+  const {colX, rowY, top, bot} = geom();
+  let c = start;
+  const pts = [[colX(c), top]];
+  for (let r = 0; r < ROWS; r++){
+    const y = rowY(r);
+    if (c > 0 && rungs[r][c-1]){ pts.push([colX(c), y]); c--; pts.push([colX(c), y]); }
+    else if (c < n - 1 && rungs[r][c]){ pts.push([colX(c), y]); c++; pts.push([colX(c), y]); }
+  }
+  pts.push([colX(c), bot]);
+  let len = 0;
+  for (let i = 1; i < pts.length; i++) len += Math.hypot(pts[i][0]-pts[i-1][0], pts[i][1]-pts[i-1][1]);
+  return {pts, len, end: c};
+}
+
+function draw(){
+  const dpr = window.devicePixelRatio || 1;
+  const {w, h, colX, rowY, top, bot} = geom();
+  if (cv.width !== Math.round(w*dpr) || cv.height !== Math.round(h*dpr)){ cv.width = Math.round(w*dpr); cv.height = Math.round(h*dpr); }
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.clearRect(0,0,w,h);
+  ctx.lineCap = "round"; ctx.lineJoin = "round";
+  off.width = cv.width; off.height = cv.height;
+  octx.setTransform(dpr,0,0,dpr,0,0); octx.clearRect(0,0,w,h);
+  octx.lineCap = "round"; octx.strokeStyle = css("--line"); octx.lineWidth = 3; octx.globalAlpha = .6;
+  octx.beginPath();
+  for (let i = 0; i < n; i++){ octx.moveTo(colX(i), top); octx.lineTo(colX(i), bot); }
+  for (let r = 0; r < ROWS; r++) for (let g = 0; g < n-1; g++) if (rungs[r][g]){
+    octx.moveTo(colX(g), rowY(r)); octx.lineTo(colX(g+1), rowY(r));
+  }
+  octx.stroke();
+  ctx.drawImage(off, 0, 0, w, h);
+  if (blurOn){
+    // hide the middle rows: wipe the band, redraw it blurred, then lay a frosted veil on top
+    const y0 = (rowY(2) + rowY(3)) / 2, y1 = (rowY(8) + rowY(9)) / 2;
+    ctx.save();
+    ctx.beginPath(); ctx.rect(0, y0, w, y1 - y0); ctx.clip();
+    ctx.fillStyle = css("--paper"); ctx.fillRect(0, y0, w, y1 - y0);
+    if ("filter" in ctx){ ctx.filter = "blur(12px)"; ctx.drawImage(off, 0, 0, w, h); ctx.filter = "none"; }
+    ctx.fillStyle = css("--veil"); ctx.globalAlpha = .82; ctx.fillRect(0, y0, w, y1 - y0); ctx.globalAlpha = 1;
+    ctx.strokeStyle = css("--accent"); ctx.globalAlpha = .18; ctx.lineWidth = 10;
+    ctx.beginPath();
+    for (let x = -h; x < w + h; x += 28){ ctx.moveTo(x, y1); ctx.lineTo(x + (y1 - y0), y0); }
+    ctx.stroke(); ctx.globalAlpha = 1;
+    ctx.fillStyle = css("--muted"); ctx.font = '20px "Jua", sans-serif'; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillText("? 가려진 구간 ?", w / 2, (y0 + y1) / 2);
+    ctx.restore();
+  }
+  for (const k in traces){
+    const t = traces[k];
+    // recompute geometry so the trace follows resizes
+    const p = pathFor(+k); t.pts = p.pts; t.len = p.len;
+    let remain = t.prog * t.len;
+    ctx.strokeStyle = color(+k); ctx.lineWidth = 6;
+    ctx.beginPath(); ctx.moveTo(t.pts[0][0], t.pts[0][1]);
+    let last = t.pts[0];
+    for (let i = 1; i < t.pts.length && remain > 0; i++){
+      const a = t.pts[i-1], b = t.pts[i];
+      const seg = Math.hypot(b[0]-a[0], b[1]-a[1]);
+      if (seg <= remain){ ctx.lineTo(b[0], b[1]); last = b; remain -= seg; }
+      else { const f = remain/seg; last = [a[0]+(b[0]-a[0])*f, a[1]+(b[1]-a[1])*f]; ctx.lineTo(last[0], last[1]); remain = 0; }
+    }
+    ctx.stroke();
+    // which way the mascot is heading on the current segment
+    let dir = 0;
+    { let r2 = t.prog * t.len;
+      for (let i = 1; i < t.pts.length; i++){ const a = t.pts[i-1], b = t.pts[i]; const seg = Math.hypot(b[0]-a[0], b[1]-a[1]);
+        if (r2 <= seg){ dir = Math.sign(b[0]-a[0]); break; } r2 -= seg; } }
+    mascots.push({x:last[0], y:last[1], k:+k, moving:t.prog < 1, dir});
+  }
+  for (const m of mascots) drawMascot(m);
+  mascots.length = 0;
+  for (const q of sparks){
+    ctx.globalAlpha = Math.max(0, q.life);
+    ctx.fillStyle = q.c;
+    ctx.save(); ctx.translate(q.x, q.y); ctx.rotate(q.rot);
+    if (q.star){ star(0,0,5,2.2); } else { ctx.fillRect(-3,-1.5,6,3); }
+    ctx.restore();
+  }
+  ctx.globalAlpha = 1;
+}
+
+const mascots = [], sparks = [];
+let clock = 0;
+function star(x,y,R,r){
+  ctx.beginPath();
+  for (let i = 0; i < 10; i++){ const a = -Math.PI/2 + i*Math.PI/5, rr = i%2 ? r : R; ctx.lineTo(x+Math.cos(a)*rr, y+Math.sin(a)*rr); }
+  ctx.closePath(); ctx.fill();
+}
+// Original tangerine buddy: round body, leaf hat, player-coloured scarf
+function drawMascot({x, y, k, moving, dir}){
+  const R = 13;
+  const ph = clock * 0.35 + k;
+  const hop = moving && !reduce ? Math.abs(Math.sin(ph)) * 5 : 0;
+  const tilt = moving && !reduce ? dir * 0.18 + Math.sin(ph) * 0.06 : 0;
+  ctx.save();
+  ctx.translate(x, y - hop);
+  // shadow
+  ctx.fillStyle = "rgba(0,0,0,.18)"; ctx.beginPath(); ctx.ellipse(0, R + hop + 1, R*0.8 - hop*0.6, 3, 0, 0, Math.PI*2); ctx.fill();
+  ctx.rotate(tilt);
+  // feet
+  const step = moving && !reduce ? Math.sin(ph*2) * 3 : 0;
+  ctx.fillStyle = "#7a3b0c";
+  ctx.beginPath(); ctx.ellipse(-5 + step, R - 1, 4, 2.6, 0, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(5 - step, R - 1, 4, 2.6, 0, 0, Math.PI*2); ctx.fill();
+  // body
+  const g = ctx.createRadialGradient(-4, -5, 2, 0, 0, R);
+  g.addColorStop(0, "#ffc06a"); g.addColorStop(1, "#f57c0f");
+  ctx.fillStyle = g; ctx.strokeStyle = "#a9500b"; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.ellipse(0, 0, R, R*0.92, 0, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+  // peel dots
+  ctx.fillStyle = "rgba(169,80,11,.35)";
+  [[-7,4],[7,5],[-2,8],[8,-3]].forEach(([a,b]) => { ctx.beginPath(); ctx.arc(a, b, 0.9, 0, Math.PI*2); ctx.fill(); });
+  // stem + leaf
+  ctx.fillStyle = "#6b4a1e"; ctx.fillRect(-1, -R - 1, 2, 4);
+  ctx.fillStyle = "#3fa34d";
+  ctx.beginPath(); ctx.ellipse(5, -R - 1, 6, 2.8, -0.5, 0, Math.PI*2); ctx.fill();
+  // scarf in player colour
+  ctx.fillStyle = color(k);
+  ctx.beginPath(); ctx.ellipse(0, 5.5, R*0.8, 2.6, 0, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(6, 6); ctx.lineTo(10 - dir*2, 12); ctx.lineTo(4, 8); ctx.closePath(); ctx.fill();
+  // face
+  const look = dir * 1.5;
+  const blink = (Math.floor(clock + k*17) % 140) < 4;
+  ctx.fillStyle = "#3a1d06";
+  if (blink){ ctx.fillRect(-5.5 + look, -3, 3.5, 1.2); ctx.fillRect(2 + look, -3, 3.5, 1.2); }
+  else {
+    ctx.beginPath(); ctx.arc(-3.8 + look, -2.5, 1.9, 0, Math.PI*2); ctx.arc(3.8 + look, -2.5, 1.9, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = "#fff"; ctx.beginPath(); ctx.arc(-3.2 + look, -3.2, 0.7, 0, Math.PI*2); ctx.arc(4.4 + look, -3.2, 0.7, 0, Math.PI*2); ctx.fill();
+  }
+  ctx.fillStyle = "rgba(255,90,90,.55)";
+  ctx.beginPath(); ctx.ellipse(-7.5 + look, 0.8, 2.4, 1.5, 0, 0, Math.PI*2); ctx.ellipse(7.5 + look, 0.8, 2.4, 1.5, 0, 0, Math.PI*2); ctx.fill();
+  ctx.strokeStyle = "#3a1d06"; ctx.lineWidth = 1.3; ctx.lineCap = "round";
+  ctx.beginPath();
+  if (moving) ctx.arc(look, 0.6, 2.2, 0.15*Math.PI, 0.85*Math.PI);
+  else { ctx.ellipse(look, 1.6, 2.2, 1.8, 0, 0, Math.PI*2); ctx.fillStyle = "#c2410c"; ctx.fill(); }
+  ctx.stroke();
+  ctx.restore();
+}
+function burst(x, y, c){
+  if (reduce) return;
+  const cols = [c, css("--accent"), "#ffd23f"];
+  for (let i = 0; i < 18; i++){
+    const a = -Math.PI/2 + (Math.random() - .5) * Math.PI * 1.4, v = 2 + Math.random() * 3.5;
+    sparks.push({x, y: y - 6, vx: Math.cos(a)*v, vy: Math.sin(a)*v, life: 1, rot: Math.random()*6, vr: (Math.random()-.5)*.4,
+      c: cols[i % 3], star: i % 3 === 2});
+  }
+}
+
+let raf = null;
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+function animate(){
+  let active = false;
+  clock++;
+  for (const k in traces){
+    const t = traces[k];
+    if (t.prog < 1){ t.prog = reduce ? 1 : Math.min(1, t.prog + 300 / 60 / t.len); active = true;
+      if (t.prog >= 1) { const e = t.pts[t.pts.length-1]; burst(e[0], e[1], color(+k)); renderChips(); renderList(); } }
+  }
+  for (let i = sparks.length - 1; i >= 0; i--){
+    const q = sparks[i]; q.x += q.vx; q.y += q.vy; q.vy += 0.15; q.rot += q.vr; q.life -= 0.02;
+    if (q.life <= 0) sparks.splice(i, 1);
+  }
+  if (sparks.length) active = true;
+  draw();
+  raf = active ? requestAnimationFrame(animate) : null;
+}
+function start(i){
+  if (traces[i]) return;
+  const p = pathFor(i);
+  traces[i] = {...p, prog: 0};
+  renderChips();
+  if (!raf) raf = requestAnimationFrame(animate);
+}
+
+function renderChips(){
+  const cols = `repeat(${n}, minmax(0,1fr))`;
+  const t = $("top"), b = $("bottom");
+  t.style.gridTemplateColumns = b.style.gridTemplateColumns = cols;
+  t.innerHTML = ""; b.innerHTML = "";
+  const endOwner = {};
+  for (const k in traces) if (traces[k].prog >= 1) endOwner[traces[k].end] = +k;
+  for (let i = 0; i < n; i++){
+    const btn = document.createElement("button");
+    btn.className = "chip"; btn.textContent = names[i] || `참가자${i+1}`;
+    btn.title = btn.textContent;
+    if (traces[i]){ btn.classList.add("done"); btn.style.background = color(i); }
+    btn.addEventListener("click", () => start(i));
+    t.append(btn);
+    const d = document.createElement("div");
+    d.className = "chip res";
+    const owner = endOwner[i];
+    const shown = !hide || owner !== undefined;
+    d.textContent = shown ? (results[i] || "—") : "?";
+    d.title = shown ? d.textContent : "";
+    if (!shown) d.classList.add("hidden-r");
+    if (owner !== undefined){ d.classList.add("done"); d.style.background = color(owner); }
+    b.append(d);
+  }
+}
+
+function renderList(){
+  const l = $("list"); l.innerHTML = "";
+  const done = Object.keys(traces).map(Number).filter(k => traces[k].prog >= 1).sort((a,b)=>a-b);
+  $("empty").hidden = done.length > 0;
+  for (const k of done){
+    const li = document.createElement("li");
+    const nm = document.createElement("b"); nm.textContent = names[k] || `참가자${k+1}`; nm.style.color = color(k);
+    li.append(nm, document.createTextNode(" → " + (results[traces[k].end] || "—")));
+    l.append(li);
+  }
+}
+
+function rebuild(){ sparks.length = 0; generate(); renderChips(); renderList(); draw(); }
+
+$("minus").onclick = () => { if (n > 2){ n--; renderFields(); rebuild(); } };
+$("plus").onclick = () => { if (n < 10){ n++; renderFields(); rebuild(); } };
+$("build").onclick = rebuild;
+$("reset").onclick = () => { traces = {}; sparks.length = 0; renderChips(); renderList(); draw(); };
+$("all").onclick = () => { for (let i = 0; i < n; i++) start(i); };
+$("blurOn").onchange = e => { blurOn = e.target.checked; draw(); };
+$("hide").onchange = e => { hide = e.target.checked; renderChips(); };
+
+new ResizeObserver(() => draw()).observe(cv);
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { renderChips(); draw(); });
+new MutationObserver(() => { renderChips(); draw(); }).observe(document.documentElement, {attributes:true, attributeFilter:["data-theme"]});
+
+renderFields(); rebuild();
+</script>
+
+</body></html>

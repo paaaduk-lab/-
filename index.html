@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>우리들의 작은 도구함 🧸</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#fbf7f1;
+    --ink:#4a4340;
+    --ink-soft:#8a817c;
+    --card:#ffffff;
+    --line:#efe6dc;
+    --fun:#ffd9cf;      --fun-deep:#e88a74;
+    --news:#d6e9f5;     --news-deep:#5f97bd;
+    --work:#dcefdc;     --work-deep:#6aa66f;
+    --shadow:0 6px 0 rgba(74,67,64,.06), 0 10px 24px rgba(74,67,64,.06);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:'Gowun Dodum','Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+    background:var(--bg);
+    background-image:radial-gradient(#efe4d6 1.2px, transparent 1.2px);
+    background-size:22px 22px;
+    color:var(--ink);
+    min-height:100vh;
+    line-height:1.6;
+  }
+  .wrap{max-width:960px;margin:0 auto;padding:56px 22px 40px}
+
+  /* ---------- 헤더 ---------- */
+  header{text-align:center;margin-bottom:44px;position:relative}
+  .mascot{
+    font-size:58px;display:inline-block;
+    animation:bob 3.2s ease-in-out infinite;
+  }
+  @keyframes bob{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-8px) rotate(3deg)}}
+  h1{
+    font-family:'Jua',sans-serif;font-weight:400;
+    font-size:clamp(30px,5vw,42px);letter-spacing:-.5px;margin-top:6px;
+  }
+  h1 .hl{
+    background:linear-gradient(transparent 60%, #ffe7a8 60%);
+    padding:0 4px;
+  }
+  .sub{color:var(--ink-soft);margin-top:6px;font-size:16px}
+  .today{
+    display:inline-block;margin-top:14px;padding:6px 14px;
+    background:#fff;border:2px dashed var(--line);border-radius:999px;
+    font-size:14px;color:var(--ink-soft);
+  }
+
+  /* ---------- 섹션 ---------- */
+  section{margin-bottom:38px}
+  .sec-title{
+    display:flex;align-items:center;gap:10px;
+    font-family:'Jua',sans-serif;font-size:22px;margin-bottom:14px;
+  }
+  .sec-title .badge{
+    width:38px;height:38px;border-radius:12px;
+    display:grid;place-items:center;font-size:20px;
+  }
+  .fun  .badge{background:var(--fun)}
+  .news .badge{background:var(--news)}
+  .work .badge{background:var(--work)}
+  .sec-title .count{
+    font-family:'Gowun Dodum',sans-serif;font-size:13px;color:var(--ink-soft);
+    background:#fff;border:1.5px solid var(--line);padding:1px 10px;border-radius:999px;
+  }
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+
+  /* ---------- 카드 ---------- */
+  .card{
+    position:relative;display:flex;gap:14px;align-items:center;
+    background:var(--card);border:2px solid var(--line);border-radius:22px;
+    padding:18px 18px;text-decoration:none;color:inherit;
+    box-shadow:var(--shadow);
+    transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+  }
+  .card:hover{transform:translateY(-4px)}
+  .card:active{transform:translateY(0)}
+  .fun  .card:hover{border-color:var(--fun-deep)}
+  .news .card:hover{border-color:var(--news-deep)}
+  .work .card:hover{border-color:var(--work-deep)}
+  .card:focus-visible{outline:3px solid #ffd36b;outline-offset:3px}
+
+  .icon{
+    flex:0 0 58px;height:58px;border-radius:18px;
+    display:grid;place-items:center;font-size:30px;
+    transition:transform .25s ease;
+  }
+  .card:hover .icon{transform:rotate(-8deg) scale(1.08)}
+  .fun  .icon{background:var(--fun)}
+  .news .icon{background:var(--news)}
+  .work .icon{background:var(--work)}
+
+  .txt b{display:block;font-family:'Jua',sans-serif;font-weight:400;font-size:19px}
+  .txt span{font-size:14px;color:var(--ink-soft)}
+  .arrow{
+    margin-left:auto;font-size:18px;color:#cfc4b9;transition:transform .18s, color .18s;
+  }
+  .card:hover .arrow{transform:translateX(4px);color:var(--ink)}
+  .ext{
+    position:absolute;top:10px;right:14px;font-size:11px;color:var(--ink-soft);
+    background:#faf6f0;border-radius:999px;padding:0 8px;
+  }
+
+  footer{
+    text-align:center;color:var(--ink-soft);font-size:13px;margin-top:20px;
+  }
+  footer .paws{letter-spacing:6px}
+
+  /* 떠다니는 장식 */
+  .deco{position:fixed;pointer-events:none;opacity:.5;font-size:22px;z-index:-1}
+  .d1{top:12%;left:6%;animation:bob 5s ease-in-out infinite}
+  .d2{top:28%;right:7%;animation:bob 6s ease-in-out infinite .6s}
+  .d3{bottom:14%;left:9%;animation:bob 5.5s ease-in-out infinite 1s}
+  .d4{bottom:20%;right:10%;animation:bob 4.6s ease-in-out infinite .3s}
+  @media (max-width:640px){.deco{display:none}.wrap{padding-top:36px}}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+  <div class="deco d1">☁️</div>
+  <div class="deco d2">🌼</div>
+  <div class="deco d3">⭐</div>
+  <div class="deco d4">🍀</div>
+
+  <div class="wrap">
+    <header>
+      <div class="mascot">🧸</div>
+      <h1>우리들의 <span class="hl">작은 도구함</span></h1>
+      <p class="sub">필요한 도구를 콕! 눌러 보세요</p>
+      <div class="today" id="today"></div>
+    </header>
+
+    <!-- 재미 -->
+    <section class="fun">
+      <h2 class="sec-title"><span class="badge">🎈</span>재미 <span class="count">3</span></h2>
+      <div class="grid">
+        <a class="card" href="%EC%82%AC%EB%8B%A4%EB%A6%AC%ED%83%80%EA%B8%B0.html">
+          <div class="icon">🪜</div>
+          <div class="txt"><b>사다리타기</b><span>두근두근 운명의 사다리</span></div>
+          <div class="arrow">›</div>
+        </a>
+        <a class="card" href="%EA%B5%90%EC%9C%A1%EC%9E%A5%20%EB%A3%B0%EB%A0%9B%20%EC%B6%94%EC%B2%A8%EA%B8%B0.html">
+          <div class="icon">🎡</div>
+          <div class="txt"><b>룰렛 추첨기</b><span>빙글빙글, 누가 뽑힐까?</span></div>
+          <div class="arrow">›</div>
+        </a>
+        <a class="card" href="https://script.google.com/macros/s/AKfycbzhmRgUbfood2fEin61-JsD-ybL9k1phD6WEK_3IFTb2VGkQuC1qyLTbPnqnkOQuGdpHw/exec" target="_blank" rel="noopener">
+          <span class="ext">새 창</span>
+          <div class="icon">🍱</div>
+          <div class="txt"><b>날씨 기반 점심 고르기</b><span>오늘 날씨엔 이 메뉴!</span></div>
+          <div class="arrow">›</div>
+        </a>
+      </div>
+    </section>
+
+    <!-- 뉴스 -->
+    <section class="news">
+      <h2 class="sec-title"><span class="badge">📰</span>뉴스 <span class="count">1</span></h2>
+      <div class="grid">
+        <a class="card" href="https://claude.ai/share/6f4c5957-f2fb-4739-a888-e526e60df9b1" target="_blank" rel="noopener">
+          <span class="ext">새 창</span>
+          <div class="icon">⚡</div>
+          <div class="txt"><b>한전뉴스 대시보드</b><span>오늘의 한전 소식 한눈에</span></div>
+          <div class="arrow">›</div>
+        </a>
+      </div>
+    </section>
+
+    <!-- 업무 -->
+    <section class="work">
+      <h2 class="sec-title"><span class="badge">💼</span>업무 <span class="count">1</span></h2>
+      <div class="grid">
+        <a class="card" href="PDF_%EB%B3%91%ED%95%A9%EB%B6%84%ED%95%A0%EA%B8%B0.html">
+          <div class="icon">📎</div>
+          <div class="txt"><b>PDF 병합도구</b><span>PDF 합치기 · 나누기</span></div>
+          <div class="arrow">›</div>
+        </a>
+      </div>
+    </section>
+
+    <footer>
+      <div class="paws">🐾 🐾 🐾</div>
+      <p>오늘도 수고 많으셨어요 :)</p>
+    </footer>
+  </div>
+
+<script>
+  const d = new Date();
+  const days = ['일','월','화','수','목','금','토'];
+  const msgs = ['☀️ 좋은 하루 보내세요','🍀 오늘도 화이팅','🌷 천천히, 차근차근','☕ 커피 한 잔의 여유'];
+  document.getElementById('today').textContent =
+    `${d.getMonth()+1}월 ${d.getDate()}일 (${days[d.getDay()]}) · ${msgs[d.getDate()%msgs.length]}`;
+</script>
+</body>
+</html>
