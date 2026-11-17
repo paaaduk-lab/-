@@ -3,201 +3,191 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>우리들의 작은 도구함 🧸</title>
+<title>🌷 우리들의 작은 도구함</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --bg:#fbf7f1;
-    --ink:#4a4340;
-    --ink-soft:#8a817c;
-    --card:#ffffff;
-    --line:#efe6dc;
-    --fun:#ffd9cf;      --fun-deep:#e88a74;
-    --news:#d6e9f5;     --news-deep:#5f97bd;
-    --work:#dcefdc;     --work-deep:#6aa66f;
-    --shadow:0 6px 0 rgba(74,67,64,.06), 0 10px 24px rgba(74,67,64,.06);
+  :root {
+    --bg: #fbf7f0;
+    --paper: #fffdf9;
+    --ink: #5a4e46;
+    --ink-soft: #8f8178;
+    --line: #efe4d6;
+    --pink: #f6d6d6;
+    --pink-deep: #e8a9a9;
+    --mint: #d4ebe0;
+    --mint-deep: #93c7ae;
+    --butter: #f8ebc4;
+    --butter-deep: #e3c66f;
+    --sky: #d7e6f2;
+    --sky-deep: #94b8d6;
   }
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{
-    font-family:'Gowun Dodum','Apple SD Gothic Neo','Malgun Gothic',sans-serif;
-    background:var(--bg);
-    background-image:radial-gradient(#efe4d6 1.2px, transparent 1.2px);
-    background-size:22px 22px;
-    color:var(--ink);
-    min-height:100vh;
-    line-height:1.6;
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Gowun Dodum', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    background-color: var(--bg);
+    background-image: radial-gradient(#ead9c6 1.2px, transparent 1.2px);
+    background-size: 22px 22px;
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 48px 20px 40px;
+    line-height: 1.6;
   }
-  .wrap{max-width:960px;margin:0 auto;padding:56px 22px 40px}
+  .wrap { max-width: 760px; margin: 0 auto; }
 
-  /* ---------- 헤더 ---------- */
-  header{text-align:center;margin-bottom:44px;position:relative}
-  .mascot{
-    font-size:58px;display:inline-block;
-    animation:bob 3.2s ease-in-out infinite;
+  header { text-align: center; margin-bottom: 40px; position: relative; }
+  .badge {
+    display: inline-block;
+    background: var(--paper);
+    border: 2px dashed var(--pink-deep);
+    border-radius: 999px;
+    padding: 4px 16px;
+    font-size: 14px;
+    color: var(--ink-soft);
+    margin-bottom: 14px;
   }
-  @keyframes bob{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-8px) rotate(3deg)}}
-  h1{
-    font-family:'Jua',sans-serif;font-weight:400;
-    font-size:clamp(30px,5vw,42px);letter-spacing:-.5px;margin-top:6px;
+  h1 {
+    font-family: 'Jua', sans-serif;
+    font-weight: 400;
+    font-size: clamp(30px, 6vw, 42px);
+    letter-spacing: 1px;
   }
-  h1 .hl{
-    background:linear-gradient(transparent 60%, #ffe7a8 60%);
-    padding:0 4px;
+  h1 .hl {
+    background: linear-gradient(transparent 60%, var(--butter) 60%);
+    padding: 0 4px;
   }
-  .sub{color:var(--ink-soft);margin-top:6px;font-size:16px}
-  .today{
-    display:inline-block;margin-top:14px;padding:6px 14px;
-    background:#fff;border:2px dashed var(--line);border-radius:999px;
-    font-size:14px;color:var(--ink-soft);
-  }
+  .sub { color: var(--ink-soft); margin-top: 8px; font-size: 16px; }
+  .float { position: absolute; font-size: 26px; animation: bob 3.2s ease-in-out infinite; opacity: .85; }
+  .f1 { left: 4%; top: 6px; }
+  .f2 { right: 6%; top: 30px; animation-delay: 1.1s; }
+  @keyframes bob { 0%,100% { transform: translateY(0) rotate(-6deg); } 50% { transform: translateY(-8px) rotate(6deg); } }
 
-  /* ---------- 섹션 ---------- */
-  section{margin-bottom:38px}
-  .sec-title{
-    display:flex;align-items:center;gap:10px;
-    font-family:'Jua',sans-serif;font-size:22px;margin-bottom:14px;
+  section {
+    background: var(--paper);
+    border: 2px solid var(--line);
+    border-radius: 28px;
+    padding: 26px 24px 28px;
+    margin-bottom: 26px;
+    box-shadow: 0 6px 0 var(--line);
   }
-  .sec-title .badge{
-    width:38px;height:38px;border-radius:12px;
-    display:grid;place-items:center;font-size:20px;
+  .sec-title {
+    display: flex; align-items: center; gap: 10px;
+    font-family: 'Jua', sans-serif;
+    font-size: 24px;
+    margin-bottom: 18px;
   }
-  .fun  .badge{background:var(--fun)}
-  .news .badge{background:var(--news)}
-  .work .badge{background:var(--work)}
-  .sec-title .count{
-    font-family:'Gowun Dodum',sans-serif;font-size:13px;color:var(--ink-soft);
-    background:#fff;border:1.5px solid var(--line);padding:1px 10px;border-radius:999px;
+  .sec-title .dot {
+    width: 38px; height: 38px; border-radius: 50%;
+    display: grid; place-items: center; font-size: 20px;
   }
-
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
-
-  /* ---------- 카드 ---------- */
-  .card{
-    position:relative;display:flex;gap:14px;align-items:center;
-    background:var(--card);border:2px solid var(--line);border-radius:22px;
-    padding:18px 18px;text-decoration:none;color:inherit;
-    box-shadow:var(--shadow);
-    transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
-  }
-  .card:hover{transform:translateY(-4px)}
-  .card:active{transform:translateY(0)}
-  .fun  .card:hover{border-color:var(--fun-deep)}
-  .news .card:hover{border-color:var(--news-deep)}
-  .work .card:hover{border-color:var(--work-deep)}
-  .card:focus-visible{outline:3px solid #ffd36b;outline-offset:3px}
-
-  .icon{
-    flex:0 0 58px;height:58px;border-radius:18px;
-    display:grid;place-items:center;font-size:30px;
-    transition:transform .25s ease;
-  }
-  .card:hover .icon{transform:rotate(-8deg) scale(1.08)}
-  .fun  .icon{background:var(--fun)}
-  .news .icon{background:var(--news)}
-  .work .icon{background:var(--work)}
-
-  .txt b{display:block;font-family:'Jua',sans-serif;font-weight:400;font-size:19px}
-  .txt span{font-size:14px;color:var(--ink-soft)}
-  .arrow{
-    margin-left:auto;font-size:18px;color:#cfc4b9;transition:transform .18s, color .18s;
-  }
-  .card:hover .arrow{transform:translateX(4px);color:var(--ink)}
-  .ext{
-    position:absolute;top:10px;right:14px;font-size:11px;color:var(--ink-soft);
-    background:#faf6f0;border-radius:999px;padding:0 8px;
+  .fun .dot { background: var(--pink); }
+  .work .dot { background: var(--sky); }
+  .sec-title small {
+    font-family: 'Gowun Dodum', sans-serif;
+    font-size: 14px; color: var(--ink-soft); margin-left: auto;
   }
 
-  footer{
-    text-align:center;color:var(--ink-soft);font-size:13px;margin-top:20px;
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
+  .card {
+    position: relative;
+    display: flex; flex-direction: column; align-items: flex-start; gap: 6px;
+    text-decoration: none; color: var(--ink);
+    background: var(--c);
+    border: 2px solid var(--cd);
+    border-radius: 22px;
+    padding: 20px 18px 18px;
+    box-shadow: 0 5px 0 var(--cd);
+    transition: transform .18s ease, box-shadow .18s ease;
   }
-  footer .paws{letter-spacing:6px}
+  .card:hover, .card:focus-visible {
+    transform: translateY(-4px);
+    box-shadow: 0 9px 0 var(--cd);
+    outline: none;
+  }
+  .card:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--cd); }
+  .card .ico {
+    font-size: 34px; width: 58px; height: 58px; border-radius: 18px;
+    background: rgba(255,255,255,.7);
+    display: grid; place-items: center;
+    margin-bottom: 4px;
+  }
+  .card:hover .ico { animation: wiggle .5s ease; }
+  @keyframes wiggle { 25% { transform: rotate(-10deg); } 75% { transform: rotate(10deg); } }
+  .card h3 { font-family: 'Jua', sans-serif; font-weight: 400; font-size: 20px; }
+  .card p { font-size: 14px; color: var(--ink-soft); }
+  .card .go {
+    position: absolute; right: 16px; top: 18px;
+    font-size: 13px; background: var(--paper);
+    border-radius: 999px; padding: 2px 10px;
+    color: var(--ink-soft);
+  }
+  .pink { --c: var(--pink); --cd: var(--pink-deep); }
+  .mint { --c: var(--mint); --cd: var(--mint-deep); }
+  .butter { --c: var(--butter); --cd: var(--butter-deep); }
+  .sky { --c: var(--sky); --cd: var(--sky-deep); }
 
-  /* 떠다니는 장식 */
-  .deco{position:fixed;pointer-events:none;opacity:.5;font-size:22px;z-index:-1}
-  .d1{top:12%;left:6%;animation:bob 5s ease-in-out infinite}
-  .d2{top:28%;right:7%;animation:bob 6s ease-in-out infinite .6s}
-  .d3{bottom:14%;left:9%;animation:bob 5.5s ease-in-out infinite 1s}
-  .d4{bottom:20%;right:10%;animation:bob 4.6s ease-in-out infinite .3s}
-  @media (max-width:640px){.deco{display:none}.wrap{padding-top:36px}}
-  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+  footer { text-align: center; color: var(--ink-soft); font-size: 14px; margin-top: 10px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .float, .card:hover .ico { animation: none; }
+    .card { transition: none; }
+  }
 </style>
 </head>
 <body>
-  <div class="deco d1">☁️</div>
-  <div class="deco d2">🌼</div>
-  <div class="deco d3">⭐</div>
-  <div class="deco d4">🍀</div>
-
   <div class="wrap">
     <header>
-      <div class="mascot">🧸</div>
+      <span class="float f1">🌼</span>
+      <span class="float f2">☁️</span>
+      <div class="badge">✿ 오늘도 좋은 하루 ✿</div>
       <h1>우리들의 <span class="hl">작은 도구함</span></h1>
-      <p class="sub">필요한 도구를 콕! 눌러 보세요</p>
-      <div class="today" id="today"></div>
+      <p class="sub">필요한 걸 콕 눌러서 바로 써 보세요 🐾</p>
     </header>
 
-    <!-- 재미 -->
     <section class="fun">
-      <h2 class="sec-title"><span class="badge">🎈</span>재미 <span class="count">3</span></h2>
+      <div class="sec-title">
+        <span class="dot">🎈</span> 재미
+        <small>잠깐 쉬어가요</small>
+      </div>
       <div class="grid">
-        <a class="card" href="%EC%82%AC%EB%8B%A4%EB%A6%AC%ED%83%80%EA%B8%B0.html">
-          <div class="icon">🪜</div>
-          <div class="txt"><b>사다리타기</b><span>두근두근 운명의 사다리</span></div>
-          <div class="arrow">›</div>
+        <a class="card pink" href="사다리타기.html">
+          <span class="go">열기 →</span>
+          <span class="ico">🪜</span>
+          <h3>사다리타기</h3>
+          <p>두근두근, 누가 걸릴까?</p>
         </a>
-        <a class="card" href="%EA%B5%90%EC%9C%A1%EC%9E%A5%20%EB%A3%B0%EB%A0%9B%20%EC%B6%94%EC%B2%A8%EA%B8%B0.html">
-          <div class="icon">🎡</div>
-          <div class="txt"><b>룰렛 추첨기</b><span>빙글빙글, 누가 뽑힐까?</span></div>
-          <div class="arrow">›</div>
+        <a class="card butter" href="교육장%20룰렛%20추첨기.html">
+          <span class="go">열기 →</span>
+          <span class="ico">🎡</span>
+          <h3>룰렛 추첨기</h3>
+          <p>빙글빙글 돌려서 공정하게!</p>
         </a>
-        <a class="card" href="https://script.google.com/macros/s/AKfycbzhmRgUbfood2fEin61-JsD-ybL9k1phD6WEK_3IFTb2VGkQuC1qyLTbPnqnkOQuGdpHw/exec" target="_blank" rel="noopener">
-          <span class="ext">새 창</span>
-          <div class="icon">🍱</div>
-          <div class="txt"><b>날씨 기반 점심 고르기</b><span>오늘 날씨엔 이 메뉴!</span></div>
-          <div class="arrow">›</div>
+        <a class="card mint" href="https://script.google.com/macros/s/AKfycbzhmRgUbfood2fEin61-JsD-ybL9k1phD6WEK_3IFTb2VGkQuC1qyLTbPnqnkOQuGdpHw/exec" target="_blank" rel="noopener">
+          <span class="go">새 창 ↗</span>
+          <span class="ico">🍱</span>
+          <h3>날씨 기반 점심 고르기</h3>
+          <p>오늘 날씨엔 뭐가 맛있을까?</p>
         </a>
       </div>
     </section>
 
-    <!-- 뉴스 -->
-    <section class="news">
-      <h2 class="sec-title"><span class="badge">📰</span>뉴스 <span class="count">1</span></h2>
-      <div class="grid">
-        <a class="card" href="https://claude.ai/share/6f4c5957-f2fb-4739-a888-e526e60df9b1" target="_blank" rel="noopener">
-          <span class="ext">새 창</span>
-          <div class="icon">⚡</div>
-          <div class="txt"><b>한전뉴스 대시보드</b><span>오늘의 한전 소식 한눈에</span></div>
-          <div class="arrow">›</div>
-        </a>
-      </div>
-    </section>
-
-    <!-- 업무 -->
     <section class="work">
-      <h2 class="sec-title"><span class="badge">💼</span>업무 <span class="count">1</span></h2>
+      <div class="sec-title">
+        <span class="dot">📎</span> 업무
+        <small>일은 빠르고 간단하게</small>
+      </div>
       <div class="grid">
-        <a class="card" href="PDF_%EB%B3%91%ED%95%A9%EB%B6%84%ED%95%A0%EA%B8%B0.html">
-          <div class="icon">📎</div>
-          <div class="txt"><b>PDF 병합도구</b><span>PDF 합치기 · 나누기</span></div>
-          <div class="arrow">›</div>
+        <a class="card sky" href="PDF_병합분할기.html">
+          <span class="go">열기 →</span>
+          <span class="ico">📄</span>
+          <h3>PDF 병합도구</h3>
+          <p>여러 PDF를 하나로, 하나를 여럿으로</p>
         </a>
       </div>
     </section>
 
-    <footer>
-      <div class="paws">🐾 🐾 🐾</div>
-      <p>오늘도 수고 많으셨어요 :)</p>
-    </footer>
+    <footer>made with 🧡 · 작은 도구함</footer>
   </div>
-
-<script>
-  const d = new Date();
-  const days = ['일','월','화','수','목','금','토'];
-  const msgs = ['☀️ 좋은 하루 보내세요','🍀 오늘도 화이팅','🌷 천천히, 차근차근','☕ 커피 한 잔의 여유'];
-  document.getElementById('today').textContent =
-    `${d.getMonth()+1}월 ${d.getDate()}일 (${days[d.getDay()]}) · ${msgs[d.getDate()%msgs.length]}`;
-</script>
 </body>
 </html>
